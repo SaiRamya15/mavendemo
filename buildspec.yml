@@ -18,12 +18,6 @@ phases:
       - echo Building the application...
       - mvn clean package
 
-  post_build:
-    commands:
-      - echo Deploying to EC2...
-      - scp -i ec2_key.pem target/*.jar $EC2_HOST:/home/ec2-user/
-      - ssh -o StrictHostKeyChecking=no -i ec2_key.pem $EC2_HOST "pkill -f 'java -jar' || true && nohup java -jar /home/ec2-user/*.jar > app.log 2>&1 &"
-      - echo Deployment complete!
 
 artifacts:
   base-directory: target
