@@ -7,28 +7,23 @@ phases:
     commands:
       - echo Installing Maven...
       - mvn --version
-
-  pre_build:
-    commands:
-      - echo Cloning repository...
-      - - git clone --branch main https://github.com/SaiRamya15/mavendemo.git
-      - cd mavendemo
+      - echo Installing SSH tools...
+      - yum install -y openssh-clients
+      - echo Decoding private key...
+      - echo "$EC2_KEY" | base64 -d > ec2_key.pem
+      - chmod 400 ec2_key.pem
 
   build:
     commands:
       - echo Building the application...
       - mvn clean package
-      # Uncomment the following lines when ready to enable tests and static analysis
-      # - echo Running tests...
-      # - mvn test
-      # - echo Running code style checks...
-      # - mvn checkstyle:check
 
   post_build:
     commands:
-      - echo Build completed successfully!
-      # Uncomment and customize when adding deployment
-      # - if [ "$CODEBUILD_WEBHOOK_HEAD_REF" == "refs/heads/main" ]; then echo "Deploying application..."; fi
+      - echo Deploying to EC2...
+      - scp -i ec2_key.pem target/*.jar $EC2_HOST:/home/ec2-user/
+      - ssh -o StrictHostKeyChecking=no -i ec2_key.pem $EC2_HOST "pkill -f 'java -jar' || true && nohup java -jar /home/ec2-user/*.jar > app.log 2>&1 &"
+      - echo Deployment complete!
 
 artifacts:
   base-directory: target
