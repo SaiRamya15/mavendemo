@@ -1,0 +1,35 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17
+    commands:
+      - echo Installing Maven...
+      - mvn --version
+
+  pre_build:
+    commands:
+      - echo Cloning repository...
+      - git clone --branch $BRANCH_NAME https://github.com/SaiRamya15/mavendemo.git
+      - cd mavendemo
+
+  build:
+    commands:
+      - echo Building the application...
+      - mvn clean package
+      # Uncomment the following lines when ready to enable tests and static analysis
+      # - echo Running tests...
+      # - mvn test
+      # - echo Running code style checks...
+      # - mvn checkstyle:check
+
+  post_build:
+    commands:
+      - echo Build completed successfully!
+      # Uncomment and customize when adding deployment
+      # - if [ "$CODEBUILD_WEBHOOK_HEAD_REF" == "refs/heads/main" ]; then echo "Deploying application..."; fi
+
+artifacts:
+  files:
+    - mavendemo/target/*.jar
