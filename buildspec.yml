@@ -31,5 +31,6 @@ phases:
       # - if [ "$CODEBUILD_WEBHOOK_HEAD_REF" == "refs/heads/main" ]; then echo "Deploying application..."; fi
 
 artifacts:
+  base-directory: target
   files:
-    - mavendemo/target/*.jar
+    - '*.jar'
